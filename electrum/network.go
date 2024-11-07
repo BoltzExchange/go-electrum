@@ -175,8 +175,13 @@ func (s *Client) listen() {
 			s.handlersLock.RUnlock()
 
 			if ok {
+				if DebugMode {
+					log.Printf("Handler for msg %d found", msg.ID)
+				}
 				// TODO: very rare case. fix this memory leak, when nobody will read channel (in case of error)
 				c <- result
+			} else if DebugMode {
+				log.Printf("No handler for msg %d not found", msg.ID)
 			}
 		}
 	}
