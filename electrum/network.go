@@ -217,12 +217,6 @@ func (s *Client) request(ctx context.Context, method string, params []interface{
 
 	bytes = append(bytes, nl)
 
-	err = s.transport.SendMessage(bytes)
-	if err != nil {
-		s.Shutdown()
-		return err
-	}
-
 	c := make(chan *container, 1)
 
 	s.handlersLock.Lock()
@@ -234,6 +228,12 @@ func (s *Client) request(ctx context.Context, method string, params []interface{
 		delete(s.handlers, msg.ID)
 		s.handlersLock.Unlock()
 	}()
+
+	err = s.transport.SendMessage(bytes)
+	if err != nil {
+		s.Shutdown()
+		return err
+	}
 
 	var resp *container
 	select {
